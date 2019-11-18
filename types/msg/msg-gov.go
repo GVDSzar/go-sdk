@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/binance-chain/go-sdk/common/types"
 	"github.com/pkg/errors"
 	"github.com/tendermint/go-amino"
+	"go-sdk/common/types"
 )
 
 // name to idetify transaction types
@@ -359,7 +359,7 @@ func (msg DepositMsg) Get(key interface{}) (value interface{}) {
 
 // Implements Msg.
 func (msg DepositMsg) GetSignBytes() []byte {
-	b, err := MsgCdc.MarshalJSON(msg)
+	b, err := Cdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}

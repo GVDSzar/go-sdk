@@ -2,9 +2,9 @@ package query
 
 import (
 	"encoding/json"
-	"github.com/binance-chain/go-sdk/common/types"
+	"go-sdk/common/types"
 
-	"github.com/binance-chain/go-sdk/common"
+	"go-sdk/common"
 )
 
 // GetTicker24h returns ticker 24h

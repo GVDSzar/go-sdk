@@ -1,14 +1,31 @@
 package types
 
 import (
+	"math/big"
 	"sort"
 	"strings"
 )
 
 // Coin def
+type CoinWs struct {
+	Denom  string `json:"denom"`
+	Amount string `json:"amount"`
+}
+
 type Coin struct {
 	Denom  string `json:"denom"`
 	Amount int64  `json:"amount"`
+}
+
+type Int struct {
+	I *big.Int
+}
+
+func (i *Int) Set(x int) {
+	if i.I == nil {
+		i.I = new(big.Int)
+	}
+	i.I.SetInt64(int64(x))
 }
 
 func (coin Coin) IsZero() bool {
@@ -31,11 +48,13 @@ func (coin Coin) Plus(coinB Coin) Coin {
 	if !coin.SameDenomAs(coinB) {
 		return coin
 	}
-	return Coin{coin.Denom, coin.Amount + coinB.Amount}
+	i := coin.Amount + coinB.Amount
+	return Coin{coin.Denom, i}
 }
 
 // Coins def
 type Coins []Coin
+type CoinsWs []CoinWs
 
 func (coins Coins) IsValid() bool {
 	switch len(coins) {

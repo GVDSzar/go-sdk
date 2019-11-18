@@ -1,12 +1,12 @@
 package ledger
 
 import (
-	"github.com/binance-chain/go-sdk/common/types"
 	ledgergo "github.com/binance-chain/ledger-cosmos-go"
 	"github.com/btcsuite/btcd/btcec"
 	tmbtcec "github.com/tendermint/btcd/btcec"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"go-sdk/common/types"
 )
 
 var (
@@ -16,7 +16,6 @@ var (
 )
 
 type (
-
 	// discoverLedgerFn defines a Ledger discovery function that returns a
 	// connected device or an error upon failure. Its allows a method to avoid CGO
 	// dependencies when Ledger support is potentially not enabled.

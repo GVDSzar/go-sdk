@@ -1,14 +1,15 @@
 package client
 
 import (
+	conf "go-sdk/types"
 	"gopkg.in/resty.v1"
 
-	"github.com/binance-chain/go-sdk/client/basic"
-	"github.com/binance-chain/go-sdk/client/query"
-	"github.com/binance-chain/go-sdk/client/transaction"
-	"github.com/binance-chain/go-sdk/client/websocket"
-	"github.com/binance-chain/go-sdk/common/types"
-	"github.com/binance-chain/go-sdk/keys"
+	"go-sdk/client/basic"
+	"go-sdk/client/query"
+	"go-sdk/client/transaction"
+	"go-sdk/client/websocket"
+	"go-sdk/common/types"
+	"go-sdk/keys"
 )
 
 // dexClient wrapper
@@ -37,6 +38,19 @@ func NewDexClient(baseUrl string, network types.ChainNetwork, keyManager keys.Ke
 	w := websocket.NewClient(c)
 	q := query.NewClient(c)
 	n, err := q.GetNodeInfo()
+	if err != nil {
+		return nil, err
+	}
+	t := transaction.NewClient(n.NodeInfo.Network, keyManager, q, c)
+	return &dexClient{BasicClient: c, QueryClient: q, TransactionClient: t, WSClient: w}, nil
+}
+
+func NewCustomClient(baseUrl string, network types.ChainNetwork, keyManager keys.KeyManager) (DexClient, error) {
+	types.Network = network
+	c := basic.NewCustomClient(baseUrl, conf.UnsafeApiSchema, conf.NoPrefix)
+	w := websocket.NewClient(c)
+	q := query.NewClient(c)
+	n, err := q.GetShortNodeInfo()
 	if err != nil {
 		return nil, err
 	}

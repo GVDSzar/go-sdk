@@ -3,9 +3,9 @@ package transaction
 import (
 	"fmt"
 
-	"github.com/binance-chain/go-sdk/common"
-	"github.com/binance-chain/go-sdk/types/msg"
-	"github.com/binance-chain/go-sdk/types/tx"
+	"go-sdk/common"
+	"go-sdk/types/msg"
+	"go-sdk/types/tx"
 )
 
 type CancelOrderResult struct {
@@ -29,5 +29,4 @@ func (c *client) CancelOrder(baseAssetSymbol, quoteAssetSymbol, refId string, sy
 	}
 
 	return &CancelOrderResult{*commit}, nil
-
 }

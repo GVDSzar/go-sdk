@@ -3,8 +3,8 @@ package transaction
 import (
 	"fmt"
 
-	"github.com/binance-chain/go-sdk/types/msg"
-	"github.com/binance-chain/go-sdk/types/tx"
+	"go-sdk/types/msg"
+	"go-sdk/types/tx"
 )
 
 type BurnTokenResult struct {
@@ -28,5 +28,4 @@ func (c *client) BurnToken(symbol string, amount int64, sync bool, options ...Op
 	}
 
 	return &BurnTokenResult{*commit}, nil
-
 }

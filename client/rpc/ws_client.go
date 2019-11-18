@@ -23,8 +23,8 @@ import (
 	"github.com/tendermint/tendermint/rpc/lib/types"
 	"github.com/tendermint/tendermint/types"
 
-	"github.com/binance-chain/go-sdk/common/uuid"
-	"github.com/binance-chain/go-sdk/types/tx"
+	"go-sdk/common/uuid"
+	"go-sdk/types/tx"
 )
 
 const (

@@ -14,13 +14,13 @@ import (
 
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
-	"github.com/binance-chain/go-sdk/common"
-	"github.com/binance-chain/go-sdk/common/ledger"
-	"github.com/binance-chain/go-sdk/common/types"
-	ctypes "github.com/binance-chain/go-sdk/common/types"
-	"github.com/binance-chain/go-sdk/common/uuid"
-	"github.com/binance-chain/go-sdk/types/tx"
 	"github.com/tendermint/tendermint/crypto"
+	"go-sdk/common"
+	"go-sdk/common/ledger"
+	"go-sdk/common/types"
+	ctypes "go-sdk/common/types"
+	"go-sdk/common/uuid"
+	"go-sdk/types/tx"
 )
 
 const (
@@ -210,8 +210,7 @@ func (m *keyManager) Sign(msg tx.StdSignMsg) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	//return bz, nil
-	return []byte(hex.EncodeToString(bz)), nil
+	return bz, nil
 }
 
 func (m *keyManager) GetPrivKey() crypto.PrivKey {

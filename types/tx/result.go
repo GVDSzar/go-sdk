@@ -12,11 +12,19 @@ type TxResult struct {
 	Code int32  `json:"code"`
 }
 
+type QueryErrorResult struct {
+	CodeSpace string `json:"codespace"`
+	Code      uint64 `json:"code"`
+	Message   string `json:"message"`
+}
+
 // TxCommitResult for POST tx results
 type TxCommitResult struct {
-	Ok   bool   `json:"ok"`
-	Log  string `json:"log"`
-	Hash string `json:"hash"`
-	Code int32  `json:"code"`
-	Data string `json:"data"`
+	Ok     bool   `json:"ok"`
+	Height string `json:"height"`
+	Log    string `json:"log"`
+	RaeLog string `json:"raw_log"`
+	Hash   string `json:"hash"`
+	Code   int32  `json:"code"`
+	Data   string `json:"data"`
 }

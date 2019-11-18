@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/binance-chain/go-sdk/common/types"
+	"go-sdk/common/types"
 )
 
 // SendMsg - high level transaction of the coin module
@@ -92,7 +92,7 @@ type Input struct {
 
 // Return bytes to sign for Input
 func (in Input) GetSignBytes() []byte {
-	bin, err := MsgCdc.MarshalJSON(in)
+	bin, err := Cdc.MarshalJSON(in)
 	if err != nil {
 		panic(err)
 	}
@@ -133,7 +133,7 @@ type Output struct {
 
 // Return bytes to sign for Output
 func (out Output) GetSignBytes() []byte {
-	bin, err := MsgCdc.MarshalJSON(out)
+	bin, err := Cdc.MarshalJSON(out)
 	if err != nil {
 		panic(err)
 	}

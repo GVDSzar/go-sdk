@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	BIPPurpose  = 44
-	BIPCoinType = 714
-	BIPChange   = false
-	BIP44Prefix = "44'/714'/"
-	PartialPath = "0'/0/0"
+	BIPPurpose  = 44          //original value: 44
+	BIPCoinType = 118         //original value: 714
+	BIPChange   = false       //original value: false
+	BIP44Prefix = "44'/118'/" //original value: "44'/714'/"
+	PartialPath = "0'/0/0"    //original value: "0'/0/0"
 	FullPath    = BIP44Prefix + PartialPath
 )
 
@@ -45,7 +45,6 @@ func NewParams(purpose, coinType, account uint32, change bool, addressIdx uint32
 		addressIdx: addressIdx,
 	}
 }
-
 
 // NewBinanceBIP44Params creates a BIP 44 parameter object from the params:
 // m / 44' / 714' / account' / 0 / address_index

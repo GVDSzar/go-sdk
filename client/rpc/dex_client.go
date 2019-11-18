@@ -3,15 +3,29 @@ package rpc
 import (
 	"errors"
 	"fmt"
-	"github.com/binance-chain/go-sdk/common/types"
-	"github.com/binance-chain/go-sdk/types/tx"
+
+	"github.com/tendermint/tendermint/rpc/core/types"
+	"go-sdk/common"
+	"go-sdk/common/types"
+	"go-sdk/keys"
+	gtypes "go-sdk/types"
+	"go-sdk/types/msg"
+	"go-sdk/types/tx"
+)
+
+type SyncType int
+
+const (
+	Async SyncType = iota
+	Sync
+	Commit
 )
 
 const (
-	AccountStoreName = "acc"
-	TokenStoreName   = "tokens"
-	ParamABCIPrefix  = "param"
-	TimeLockMsgRoute = "timelock"
+	AccountStoreName    = "acc"
+	ParamABCIPrefix     = "param"
+	TimeLockMsgRoute    = "timelock"
+	AtomicSwapStoreName = "atomic_swap"
 
 	TimeLockrcNotFoundErrorCode = 458760
 )
@@ -33,6 +47,20 @@ type DexClient interface {
 	GetProposal(proposalId int64) (types.Proposal, error)
 	GetTimelocks(addr types.AccAddress) ([]types.TimeLockRecord, error)
 	GetTimelock(addr types.AccAddress, recordID int64) (*types.TimeLockRecord, error)
+	GetSwapByID(swapID types.SwapBytes) (types.AtomicSwap, error)
+	GetSwapByCreator(creatorAddr string, offset int64, limit int64) ([]types.SwapBytes, error)
+	GetSwapByRecipient(recipientAddr string, offset int64, limit int64) ([]types.SwapBytes, error)
+
+	SetKeyManager(k keys.KeyManager)
+	SendToken(transfers []msg.Transfer, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error)
+	CreateOrder(baseAssetSymbol, quoteAssetSymbol string, op int8, price, quantity int64, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error)
+	CancelOrder(baseAssetSymbol, quoteAssetSymbol, refId string, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error)
+	HTLT(recipient types.AccAddress, recipientOtherChain, senderOtherChain string, randomNumberHash []byte, timestamp int64,
+		amount types.Coins, expectedIncome string, heightSpan int64, crossChain bool, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error)
+	DepositHTLT(recipient types.AccAddress, swapID []byte, amount types.Coins,
+		syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error)
+	ClaimHTLT(swapID []byte, randomNumber []byte, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error)
+	RefundHTLT(swapID []byte, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error)
 }
 
 func (c *HTTP) TxInfoSearch(query string, prove bool, page, perPage int) ([]tx.Info, error) {
@@ -54,7 +82,7 @@ func (c *HTTP) ListAllTokens(offset int, limit int) ([]types.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !result.Response.IsOK(){
+	if !result.Response.IsOK() {
 		return nil, fmt.Errorf(result.Response.Log)
 	}
 	bz := result.Response.GetValue()
@@ -72,7 +100,7 @@ func (c *HTTP) GetTokenInfo(symbol string) (*types.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !result.Response.IsOK(){
+	if !result.Response.IsOK() {
 		return nil, fmt.Errorf(result.Response.Log)
 	}
 	bz := result.Response.GetValue()
@@ -191,7 +219,7 @@ func (c *HTTP) GetFee() ([]types.FeeParam, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !rawFee.Response.IsOK(){
+	if !rawFee.Response.IsOK() {
 		return nil, fmt.Errorf(rawFee.Response.Log)
 	}
 	var fees []types.FeeParam
@@ -207,7 +235,7 @@ func (c *HTTP) GetOpenOrders(addr types.AccAddress, pair string) ([]types.OpenOr
 	if err != nil {
 		return nil, err
 	}
-	if !rawOrders.Response.IsOK(){
+	if !rawOrders.Response.IsOK() {
 		return nil, fmt.Errorf(rawOrders.Response.Log)
 	}
 	bz := rawOrders.Response.GetValue()
@@ -233,7 +261,7 @@ func (c *HTTP) GetTradingPairs(offset int, limit int) ([]types.TradingPair, erro
 	if err != nil {
 		return nil, err
 	}
-	if !rawTradePairs.Response.IsOK(){
+	if !rawTradePairs.Response.IsOK() {
 		return nil, fmt.Errorf(rawTradePairs.Response.Log)
 	}
 	pairs := make([]types.TradingPair, 0)
@@ -255,7 +283,7 @@ func (c *HTTP) GetDepth(tradePair string, level int) (*types.OrderBook, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !rawDepth.Response.IsOK(){
+	if !rawDepth.Response.IsOK() {
 		return nil, fmt.Errorf(rawDepth.Response.Log)
 	}
 	var ob types.OrderBook
@@ -286,7 +314,7 @@ func (c *HTTP) GetTimelocks(addr types.AccAddress) ([]types.TimeLockRecord, erro
 	if rawRecords == nil {
 		return nil, fmt.Errorf("zero records")
 	}
-	if !rawRecords.Response.IsOK(){
+	if !rawRecords.Response.IsOK() {
 		return nil, fmt.Errorf(rawRecords.Response.Log)
 	}
 	records := make([]types.TimeLockRecord, 0)
@@ -348,7 +376,7 @@ func (c *HTTP) GetProposals(status types.ProposalStatus, numLatest int64) ([]typ
 	if err != nil {
 		return nil, err
 	}
-	if !rawProposals.Response.IsOK(){
+	if !rawProposals.Response.IsOK() {
 		return nil, fmt.Errorf(rawProposals.Response.Log)
 	}
 	proposals := make([]types.Proposal, 0)
@@ -369,7 +397,7 @@ func (c *HTTP) GetProposal(proposalId int64) (types.Proposal, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !rawProposal.Response.IsOK(){
+	if !rawProposal.Response.IsOK() {
 		return nil, fmt.Errorf(rawProposal.Response.Log)
 	}
 	var proposal types.Proposal
@@ -395,4 +423,291 @@ func (c *HTTP) existsCC(symbol string) bool {
 		return false
 	}
 	return true
+}
+
+func (c *HTTP) GetSwapByID(swapID types.SwapBytes) (types.AtomicSwap, error) {
+	params := types.QuerySwapByID{
+		SwapID: swapID,
+	}
+	bz, err := c.cdc.MarshalJSON(params)
+	if err != nil {
+		return types.AtomicSwap{}, err
+	}
+
+	resp, err := c.ABCIQuery(fmt.Sprintf("custom/%s/%s", msg.AtomicSwapRoute, "swapid"), bz)
+	if err != nil {
+		return types.AtomicSwap{}, err
+	}
+	if !resp.Response.IsOK() {
+		return types.AtomicSwap{}, fmt.Errorf(resp.Response.Log)
+	}
+	if len(resp.Response.GetValue()) == 0 {
+		return types.AtomicSwap{}, fmt.Errorf("zero records")
+	}
+	var result types.AtomicSwap
+	err = c.cdc.UnmarshalJSON(resp.Response.GetValue(), &result)
+	if err != nil {
+		return types.AtomicSwap{}, err
+	}
+	return result, nil
+}
+
+func (c *HTTP) GetSwapByCreator(creatorAddr string, offset int64, limit int64) ([]types.SwapBytes, error) {
+	addr, err := types.AccAddressFromBech32(creatorAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	params := types.QuerySwapByCreatorParams{
+		Creator: addr,
+		Limit:   limit,
+		Offset:  offset,
+	}
+
+	bz, err := c.cdc.MarshalJSON(params)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.ABCIQuery(fmt.Sprintf("custom/%s/%s", msg.AtomicSwapRoute, "swapcreator"), bz)
+	if err != nil {
+		return nil, err
+	}
+	if !resp.Response.IsOK() {
+		return nil, fmt.Errorf(resp.Response.Log)
+	}
+	if len(resp.Response.GetValue()) == 0 {
+		return nil, fmt.Errorf("zero records")
+	}
+	var swapIDList []types.SwapBytes
+	err = c.cdc.UnmarshalJSON(resp.Response.GetValue(), &swapIDList)
+	if err != nil {
+		return nil, err
+	}
+	return swapIDList, nil
+}
+
+func (c *HTTP) GetSwapByRecipient(recipientAddr string, offset int64, limit int64) ([]types.SwapBytes, error) {
+	recipient, err := types.AccAddressFromBech32(recipientAddr)
+	if err != nil {
+		return nil, err
+	}
+	params := types.QuerySwapByRecipientParams{
+		Recipient: recipient,
+		Limit:     limit,
+		Offset:    offset,
+	}
+
+	bz, err := c.cdc.MarshalJSON(params)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.ABCIQuery(fmt.Sprintf("custom/%s/%s", msg.AtomicSwapRoute, "swaprecipient"), bz)
+	if err != nil {
+		return nil, err
+	}
+	if !resp.Response.IsOK() {
+		return nil, fmt.Errorf(resp.Response.Log)
+	}
+	if len(resp.Response.GetValue()) == 0 {
+		return nil, fmt.Errorf("zero records")
+	}
+	var swapIDList []types.SwapBytes
+	err = c.cdc.UnmarshalJSON(resp.Response.GetValue(), &swapIDList)
+	if err != nil {
+		return nil, err
+	}
+	return swapIDList, nil
+}
+
+func (c *HTTP) SendToken(transfers []msg.Transfer, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error) {
+	if c.key == nil {
+		return nil, KeyMissingError
+	}
+	fromAddr := c.key.GetAddr()
+	fromCoins := types.Coins{}
+	for _, t := range transfers {
+		t.Coins = t.Coins.Sort()
+		fromCoins = fromCoins.Plus(t.Coins)
+	}
+	sendMsg := msg.CreateSendMsg(fromAddr, fromCoins, transfers)
+	return c.broadcast(sendMsg, syncType, options...)
+
+}
+
+func (c *HTTP) CreateOrder(baseAssetSymbol, quoteAssetSymbol string, op int8, price, quantity int64, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error) {
+	if c.key == nil {
+		return nil, KeyMissingError
+	}
+	if baseAssetSymbol == "" || quoteAssetSymbol == "" {
+		return nil, fmt.Errorf("BaseAssetSymbol or QuoteAssetSymbol is missing. ")
+	}
+	fromAddr := c.key.GetAddr()
+	newOrderMsg := msg.NewCreateOrderMsg(
+		fromAddr,
+		"",
+		op,
+		common.CombineSymbol(baseAssetSymbol, quoteAssetSymbol),
+		price,
+		quantity,
+	)
+	return c.broadcast(newOrderMsg, syncType, options...)
+}
+
+func (c *HTTP) HTLT(recipient types.AccAddress, recipientOtherChain, senderOtherChain string, randomNumberHash []byte, timestamp int64,
+	amount types.Coins, expectedIncome string, heightSpan int64, crossChain bool, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error) {
+	if c.key == nil {
+		return nil, KeyMissingError
+	}
+	fromAddr := c.key.GetAddr()
+	htltMsg := msg.NewHTLTMsg(
+		fromAddr,
+		recipient,
+		recipientOtherChain,
+		senderOtherChain,
+		randomNumberHash,
+		timestamp,
+		amount,
+		expectedIncome,
+		heightSpan,
+		crossChain,
+	)
+	return c.broadcast(htltMsg, syncType, options...)
+}
+
+func (c *HTTP) DepositHTLT(recipient types.AccAddress, swapID []byte, amount types.Coins,
+	syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error) {
+	if c.key == nil {
+		return nil, KeyMissingError
+	}
+	fromAddr := c.key.GetAddr()
+	depositHTLTMsg := msg.NewDepositHTLTMsg(
+		fromAddr,
+		swapID,
+		amount,
+	)
+	return c.broadcast(depositHTLTMsg, syncType, options...)
+}
+
+func (c *HTTP) ClaimHTLT(swapID []byte, randomNumber []byte, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error) {
+	if c.key == nil {
+		return nil, KeyMissingError
+	}
+	fromAddr := c.key.GetAddr()
+	claimHTLTMsg := msg.NewClaimHTLTMsg(
+		fromAddr,
+		swapID,
+		randomNumber,
+	)
+	return c.broadcast(claimHTLTMsg, syncType, options...)
+}
+
+func (c *HTTP) RefundHTLT(swapID []byte, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error) {
+	if c.key == nil {
+		return nil, KeyMissingError
+	}
+	fromAddr := c.key.GetAddr()
+	refundHTLTMsg := msg.NewRefundHTLTMsg(
+		fromAddr,
+		swapID,
+	)
+	return c.broadcast(refundHTLTMsg, syncType, options...)
+}
+
+func (c *HTTP) CancelOrder(baseAssetSymbol, quoteAssetSymbol, refId string, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error) {
+	if c.key == nil {
+		return nil, KeyMissingError
+	}
+	if baseAssetSymbol == "" || quoteAssetSymbol == "" {
+		return nil, fmt.Errorf("BaseAssetSymbol or QuoteAssetSymbol is missing. ")
+	}
+	if refId == "" {
+		return nil, fmt.Errorf("OrderId or Order RefId is missing. ")
+	}
+
+	fromAddr := c.key.GetAddr()
+
+	cancelOrderMsg := msg.NewCancelOrderMsg(fromAddr, common.CombineSymbol(baseAssetSymbol, quoteAssetSymbol), refId)
+	return c.broadcast(cancelOrderMsg, syncType, options...)
+}
+
+func (c *HTTP) broadcast(m msg.Msg, syncType SyncType, options ...tx.Option) (*core_types.ResultBroadcastTx, error) {
+	signBz, err := c.sign(m, options...)
+	if err != nil {
+		return nil, err
+	}
+	switch syncType {
+	case Async:
+		return c.BroadcastTxAsync(signBz)
+	case Sync:
+		return c.BroadcastTxSync(signBz)
+	case Commit:
+		commitRes, err := c.BroadcastTxCommit(signBz)
+		if err != nil {
+			return nil, err
+		}
+		if commitRes.CheckTx.IsErr() {
+			return &core_types.ResultBroadcastTx{
+				Code: commitRes.CheckTx.Code,
+				Log:  commitRes.CheckTx.Log,
+				Hash: commitRes.Hash,
+				Data: commitRes.CheckTx.Data,
+			}, nil
+		}
+		return &core_types.ResultBroadcastTx{
+			Code: commitRes.DeliverTx.Code,
+			Log:  commitRes.DeliverTx.Log,
+			Hash: commitRes.Hash,
+			Data: commitRes.DeliverTx.Data,
+		}, nil
+	default:
+		return nil, fmt.Errorf("unknown synctype")
+	}
+}
+
+func (c *HTTP) sign(m msg.Msg, options ...tx.Option) ([]byte, error) {
+	if c.key == nil {
+		return nil, fmt.Errorf("keymanager is missing, use SetKeyManager to set key")
+	}
+	// prepare message to sign
+	chainID := gtypes.ProdChainID
+	if types.Network != types.ProdNetwork {
+		chainID = gtypes.TestnetChainID
+	}
+	signMsg := &tx.StdSignMsg{
+		ChainID:       chainID,
+		AccountNumber: -1,
+		Sequence:      -1,
+		Memo:          "",
+		Msgs:          []msg.Msg{m},
+		Source:        tx.Source,
+	}
+
+	for _, op := range options {
+		signMsg = op(signMsg)
+	}
+
+	if signMsg.Sequence == -1 || signMsg.AccountNumber == -1 {
+		fromAddr := c.key.GetAddr()
+		acc, err := c.GetAccount(fromAddr)
+		if err != nil {
+			return nil, err
+		}
+		signMsg.Sequence = acc.GetSequence()
+		signMsg.AccountNumber = acc.GetAccountNumber()
+	}
+
+	// special logic for createOrder, to save account query
+	if orderMsg, ok := m.(msg.CreateOrderMsg); ok {
+		orderMsg.ID = msg.GenerateOrderID(signMsg.Sequence+1, c.key.GetAddr())
+		signMsg.Msgs[0] = orderMsg
+	}
+
+	for _, m := range signMsg.Msgs {
+		if err := m.ValidateBasic(); err != nil {
+			return nil, err
+		}
+	}
+	return c.key.Sign(*signMsg)
 }

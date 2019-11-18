@@ -4,10 +4,10 @@ import (
 	"github.com/tendermint/go-amino"
 )
 
-var MsgCdc = amino.NewCodec()
+var Cdc *amino.Codec
 
 func RegisterCodec(cdc *amino.Codec) {
-
+	Cdc = cdc
 	cdc.RegisterInterface((*Msg)(nil), nil)
 
 	cdc.RegisterConcrete(CreateOrderMsg{}, "dex/NewOrder", nil)
@@ -21,7 +21,15 @@ func RegisterCodec(cdc *amino.Codec) {
 
 	cdc.RegisterConcrete(TimeUnlockMsg{}, "tokens/TimeUnlockMsg", nil)
 	cdc.RegisterConcrete(TimeRelockMsg{}, "tokens/TimeRelockMsg", nil)
+
+	cdc.RegisterConcrete(HTLTMsg{}, "tokens/HTLTMsg", nil)
+	cdc.RegisterConcrete(DepositHTLTMsg{}, "tokens/DepositHTLTMsg", nil)
+	cdc.RegisterConcrete(ClaimHTLTMsg{}, "tokens/ClaimHTLTMsg", nil)
+	cdc.RegisterConcrete(RefundHTLTMsg{}, "tokens/RefundHTLTMsg", nil)
+
 	cdc.RegisterConcrete(DexListMsg{}, "dex/ListMsg", nil)
+	//cdc.RegisterConcrete(BuyNameReq{}, "nameservice/BuyNameReq", nil)
+	cdc.RegisterConcrete(BuyName{}, "nameservice/BuyName", nil)
 	cdc.RegisterConcrete(MintMsg{}, "tokens/MintMsg", nil)
 	//Must use cosmos-sdk.
 	cdc.RegisterConcrete(SendMsg{}, "cosmos-sdk/Send", nil)
@@ -38,5 +46,5 @@ func RegisterCodec(cdc *amino.Codec) {
 }
 
 func init() {
-	RegisterCodec(MsgCdc)
+	//RegisterCodec(Cdc)
 }

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/binance-chain/go-sdk/common/types"
+	"go-sdk/common/types"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 
 type SetAccountFlagsMsg struct {
 	From  types.AccAddress `json:"from"`
-	Flags uint64 `json:"flags"`
+	Flags uint64           `json:"flags"`
 }
 
 func NewSetAccountFlagsMsg(from types.AccAddress, flags uint64) SetAccountFlagsMsg {

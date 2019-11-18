@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/binance-chain/go-sdk/common/bech32"
 	"github.com/tendermint/tendermint/crypto"
+	"go-sdk/common/bech32"
 )
 
 type ValAddress []byte

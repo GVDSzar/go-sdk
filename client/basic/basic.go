@@ -9,9 +9,10 @@ import (
 
 	"gopkg.in/resty.v1"
 
-	"github.com/binance-chain/go-sdk/types"
-	"github.com/binance-chain/go-sdk/types/tx"
 	"github.com/gorilla/websocket"
+	"github.com/valyala/fasthttp"
+	"go-sdk/types"
+	"go-sdk/types/tx"
 )
 
 const (
@@ -21,6 +22,7 @@ const (
 type BasicClient interface {
 	Get(path string, qp map[string]string) ([]byte, int, error)
 	Post(path string, body interface{}, param map[string]string) ([]byte, error)
+	FastHttpRequest(path, method string, body []byte) (b []byte, err error)
 
 	GetTx(txHash string) (*tx.TxResult, error)
 	PostTx(hexTx []byte, param map[string]string) ([]tx.TxCommitResult, error)
@@ -34,6 +36,37 @@ type client struct {
 
 func NewClient(baseUrl string) BasicClient {
 	return &client{baseUrl: baseUrl, apiUrl: fmt.Sprintf("%s://%s", types.DefaultApiSchema, baseUrl+types.DefaultAPIVersionPrefix)}
+}
+
+func NewCustomClient(baseUrl, apiSchema, versionPrefix string) BasicClient {
+	return &client{baseUrl: baseUrl, apiUrl: fmt.Sprintf("%s://%s", apiSchema, baseUrl+versionPrefix)}
+}
+
+// faster way to execute custom requests
+func (c *client) FastHttpRequest(path, method string, body []byte) (b []byte, err error) {
+	req := fasthttp.AcquireRequest()
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseRequest(req)
+	defer fasthttp.ReleaseResponse(resp)
+
+	req.SetRequestURI(c.apiUrl + path)
+	req.Header.SetMethod(method)
+	if method != http.MethodGet {
+		req.SetBody(body)
+	}
+
+	client := new(fasthttp.Client)
+	err = client.Do(req, resp)
+	if err != nil {
+		return
+	}
+
+	if resp.StatusCode() >= http.StatusMultipleChoices || resp.StatusCode() < http.StatusOK {
+		msg := fmt.Sprintf("inappropriate status code: %v. Error message: %s", resp.StatusCode(), resp.Body())
+		return nil, HttpRequestError(msg)
+	}
+
+	return resp.Body(), nil
 }
 
 func (c *client) Get(path string, qp map[string]string) ([]byte, int, error) {

@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/binance-chain/go-sdk/common/types"
 	"github.com/tendermint/tendermint/crypto"
+	"go-sdk/common/types"
 )
 
 // Description - description fields for a validator
@@ -67,7 +67,7 @@ func (msg MsgCreateValidator) GetSigners() []types.AccAddress {
 
 // get the bytes for the message signer to sign on
 func (msg MsgCreateValidator) GetSignBytes() []byte {
-	b, err := MsgCdc.MarshalJSON(struct {
+	b, err := Cdc.MarshalJSON(struct {
 		Description
 		DelegatorAddr types.AccAddress `json:"delegator_address"`
 		ValidatorAddr types.ValAddress `json:"validator_address"`
@@ -140,7 +140,7 @@ func (msg MsgRemoveValidator) GetSigners() []types.AccAddress {
 
 // get the bytes for the message signer to sign on
 func (msg MsgRemoveValidator) GetSignBytes() []byte {
-	b, err := MsgCdc.MarshalJSON(struct {
+	b, err := Cdc.MarshalJSON(struct {
 		LauncherAddr types.AccAddress  `json:"launcher_addr"`
 		ValAddr      types.ValAddress  `json:"val_addr"`
 		ValConsAddr  types.ConsAddress `json:"val_cons_addr"`
