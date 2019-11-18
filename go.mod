@@ -7,10 +7,6 @@ require (
 	github.com/btcsuite/btcutil v0.0.0-20180706230648-ab6388e0c60a
 	github.com/cosmos/cosmos-sdk v0.37.4
 	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d
-<<<<<<< HEAD
-=======
-	github.com/fatih/structs v1.1.0
->>>>>>> 16a09dfaea01e4a04f95037c10a54d6c2ee4e454
 	github.com/gorilla/websocket v1.4.1
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.4.0
