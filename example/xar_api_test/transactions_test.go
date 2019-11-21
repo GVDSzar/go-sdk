@@ -13,14 +13,15 @@ import (
 	"go-sdk/common/types"
 	"go-sdk/keys"
 	"go-sdk/types/msg"
+	"go-sdk/types/tx"
 	"log"
 	"testing"
 )
 
 // it is assumed that std local rest-daemon is up
 const baseUrl = "localhost:1317"
-const localUserMnemonic = "boy render dentist firm wisdom sphere raw relief key orbit urban collect quick cancel junk choose pause connect surround life squeeze aisle work price"
-const localUserAddr = "xar1mu4sgq98tx3mxweknzmqt95vp3zx07gmuqk6js"
+const localUserMnemonic = "canal diesel swim expand key puppy agent airport ride shrug walnut erosion toss inside oblige square sort square inspire tackle achieve promote urge field"
+const localUserAddr = "xar14p760judpsaengg0zp8g04tgvw8x6dq9zjupse"
 
 func TestTransactions(t *testing.T) {
 	km, err := keys.NewMnemonicKeyManager(localUserMnemonic)
@@ -83,8 +84,8 @@ func testPlaceBid(t *testing.T, c client.DexClient) {
 
 func testModifyCsdtTx(t *testing.T, c client.DexClient) {
 	collateralDenom := "test"
-	collateralAmount := sdk.Int{}
-	debt := sdk.Int{}
+	collateralAmount := "0"
+	debt := "0"
 	csdt := types.NewCSDT(testingAccAddress, collateralDenom, collateralAmount, debt)
 	r := msg.NewModifyCsdtReq(br, csdt)
 	tx, err := c.ModifyCsdtTx(r)
@@ -106,8 +107,8 @@ func testModifyCsdtTx(t *testing.T, c client.DexClient) {
 }
 
 func testIssueTx(t *testing.T, c client.DexClient) {
-	name := "issueName"
-	symbol := "symbol"
+	name := "testinggname"
+	symbol := "symbolll"
 	description := "{\"desc\":\"ription\"}"
 	totalSupply := sdk.NewInt(1)
 
@@ -133,9 +134,9 @@ func testIssueTx(t *testing.T, c client.DexClient) {
 }
 
 func testIssueApproveTx(t *testing.T, c client.DexClient) {
-	name := "issueName"
-	symbol := "symbol"
-	description := "description"
+	name := "testinggname"
+	symbol := "SYMBOLLL"
+	description := "{\"desc\":\"ription\"}"
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
@@ -146,9 +147,9 @@ func testIssueApproveTx(t *testing.T, c client.DexClient) {
 	}
 	r := msg.NewPostIssueReq(br, params)
 
-	issueId := "issueId"
-	accAddr := "someAdress"
-	amount := "amount"
+	issueId := "xar174876e802"
+	accAddr := "xar14azd4p7ks2lmmq8xpxdztwe67rsfnpzt0hnqpl"
+	amount := "1"
 
 	tx, err := c.IssueApproveTx(r, issueId, accAddr, amount)
 	if err != nil {
@@ -495,13 +496,30 @@ func TestPostRequestsVer(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
+
+	//tx.RegisterCodec(amino.NewCodec())
+	var b = []byte(`{
+        "type": "issue/MsgIssueApprove",
+        "value": {
+          "issue_id": "xar174876e802",
+          "from_address": "xar14p760judpsaengg0zp8g04tgvw8x6dq9zjupse",
+          "to_address": "xar14azd4p7ks2lmmq8xpxdztwe67rsfnpzt0hnqpl",
+          "amount": "1"
+        }
+}`)
+	b = msg.MustSortJSON(b)
+	log.Println("b sorted:", string(b))
+	//stdTxBasic := new(tx.StdTxBasic)
+	msgIssueApprove := msg.MsgIssueApprove{}
+	tx.Cdc.MustUnmarshalJSON(b, &msgIssueApprove)
+
 	br.From = c.GetKeyManager().GetAddr().String()
 	//
 	//err = c.CollectAccountInfo()
 	//if err != nil {
 	//	t.Errorf(err.Error())
 	//}
-	testIssueTx(t, c)
+	testIssueApproveTx(t, c)
 
 	//testDebtAuction(t, c)
 }

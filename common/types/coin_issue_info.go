@@ -11,7 +11,7 @@ type CoinIssueInfo struct {
 	IssueTime          int64          `json:"issue_time"`
 	Name               string         `json:"name"`
 	Symbol             string         `json:"symbol"`
-	TotalSupply        sdk.Int        `json:"total_supply"`
+	TotalSupply        string        `json:"total_supply"`
 	Description        string         `json:"description"`
 	BurnOwnerDisabled  bool           `json:"burn_owner_disabled"`
 	BurnHolderDisabled bool           `json:"burn_holder_disabled"`

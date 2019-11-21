@@ -134,6 +134,7 @@ func (c *client) getValidStdTx(txRequest msg.RestTransactionRequest, path, metho
 	if err != nil {
 		return
 	}
+	log.Println("res", string(res))
 
 	if err = tx.Cdc.UnmarshalJSON(res, t); err != nil {
 		return
@@ -182,6 +183,7 @@ func (c *client) getCommitResult(stdTx *tx.TxBasic) (txRes *tx.TxBroadcastResult
 	if err != nil {
 		return nil, err
 	}
+	log.Println("rawResult", string(rawResult))
 
 	txRes = new(tx.TxBroadcastResult)
 	err = json.Unmarshal(rawResult, txRes)

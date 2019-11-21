@@ -9,7 +9,7 @@ type MsgIssueApprove struct {
 	IssueId     string           `json:"issue_id" yaml:"issue_id"`
 	FromAddress types.AccAddress `json:"from_address" yaml:"from_address"`
 	ToAddress   types.AccAddress `json:"to_address" yaml:"to_address"`
-	Amount      types.Int        `json:"amount" yaml:"amount"`
+	Amount      string        `json:"amount" yaml:"amount"`
 }
 
 // Route Implements Msg.
@@ -24,9 +24,9 @@ func (msg MsgIssueApprove) ValidateBasic() error {
 		return errors.New("issueId cannot be empty")
 	}
 	// Cannot issue zero or negative coins
-	if msg.Amount.I.Int64() < 0 {
-		return errors.New("can't approve negative coin amount")
-	}
+	//if msg.Amount.I.Int64() < 0 {
+	//	return errors.New("can't approve negative coin amount")
+	//}
 	return nil
 }
 

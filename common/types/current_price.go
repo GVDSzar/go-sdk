@@ -1,13 +1,9 @@
 package types
 
-import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-)
-
 type CurrentPrice struct {
 	AssetCode string  `json:"asset_code"`
-	Price     sdk.Dec `json:"price"`
-	Expiry    sdk.Int `json:"expiry"`
+	Price     string `json:"price"`
+	Expiry    string `json:"expiry"`
 }
 
 type CurrentPriceWithHeight struct {

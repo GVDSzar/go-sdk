@@ -9,7 +9,7 @@ type MsgIssueDecreaseApproval struct {
 	IssueId     string         `json:"issue_id" yaml:"issue_id"`
 	FromAddress sdk.AccAddress `json:"from_address" yaml:"from_address"`
 	ToAddress   sdk.AccAddress `json:"to_address" yaml:"to_address"`
-	Amount      sdk.Int        `json:"amount" yaml:"amount"`
+	Amount      string        `json:"amount" yaml:"amount"`
 }
 
 // Route Implements Msg.
@@ -24,9 +24,6 @@ func (msg MsgIssueDecreaseApproval) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidAddress("issueId cannot be empty")
 	}
 	// Cannot issue zero or negative coins
-	if msg.Amount.IsNegative() {
-		return sdk.ErrInvalidCoins("can't approve negative coin amount")
-	}
 	if msg.FromAddress.Equals(msg.ToAddress) {
 		return sdk.ErrInvalidCoins("can't approve yourself")
 	}

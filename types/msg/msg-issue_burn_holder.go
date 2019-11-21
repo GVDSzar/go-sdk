@@ -7,7 +7,7 @@ import (
 type MsgIssueBurnHolder struct {
 	IssueId     string         `json:"issue_id" yaml:"issue_id"`
 	FromAddress sdk.AccAddress `json:"from_address" yaml:"from_address"`
-	Amount      sdk.Int        `json:"amount" yaml:"amount"`
+	Amount      string         `json:"amount" yaml:"amount"`
 }
 
 // Route Implements Msg.
@@ -20,10 +20,6 @@ func (msg MsgIssueBurnHolder) Type() string { return "issue_burn_holder" }
 func (msg MsgIssueBurnHolder) ValidateBasic() sdk.Error {
 	if len(msg.IssueId) == 0 {
 		return sdk.ErrInvalidAddress("issueId cannot be empty")
-	}
-	// Cannot issue zero or negative coins
-	if !msg.Amount.IsPositive() {
-		return sdk.ErrInvalidCoins("cannot Burn 0 or negative coin amounts")
 	}
 	return nil
 }

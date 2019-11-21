@@ -1,9 +1,7 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
-
 type Approval struct {
-	Amount sdk.Int `json:"amount"`
+	Amount string `json:"amount"`
 }
 
 type IssueApprovalWithHeight struct {
