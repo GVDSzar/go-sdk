@@ -2,11 +2,10 @@ package query
 
 import (
 	"go-sdk/common"
-	"go-sdk/common/types"
 )
 
 func (c *client) CSDTs() (*QueryResponse, error) {
-	var obj = WrapQueryResponse(types.CSDTs{})
+	var obj = ResponseWithHeight()
 	resp, code, err := c.baseClient.Get(CSDTsEndpoint, emptyQP)
 	obj.MustUnmarshal(resp)
 
@@ -18,7 +17,7 @@ func (c *client) CSDTs() (*QueryResponse, error) {
 }
 
 func (c *client) CSDTParams() (*QueryResponse, error) {
-	var obj = WrapQueryResponse(types.CsdtModuleParams{})
+	var obj = ResponseWithHeight()
 	resp, code, err := c.baseClient.Get(CSDTParamsEndpoint, emptyQP)
 	obj.MustUnmarshal(resp)
 

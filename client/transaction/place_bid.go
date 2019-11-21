@@ -6,6 +6,6 @@ import (
 	"net/http"
 )
 
-func (c *client) PlaceBidTx(r *msg.PlaceBidReq) (*tx.TxCommitResult, error) {
+func (c *client) PlaceBidTx(r *msg.PlaceBidReq) (*tx.TxBroadcastResult, error) {
 	return c.RestTransaction(r, placeBidEndpoint(r.AuctionID, r.Bidder, r.Bid, r.Lot), http.MethodPut)
 }

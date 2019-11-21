@@ -92,6 +92,12 @@ type BaseAccount struct {
 	Sequence      int64         `json:"sequence"`
 }
 
+type AccountInfo struct {
+	Coins         Coins         `json:"coins"`
+	AccountNumber int64         `json:"account_number"`
+	Sequence      int64         `json:"sequence"`
+}
+
 // Implements sdk.Account.
 func (acc BaseAccount) GetAddress() AccAddress {
 	return acc.Address

@@ -19,7 +19,7 @@ import (
 
 // it is assumed that std local rest-daemon is up
 const baseUrl = "localhost:1317"
-const localUserMnemonic = "hospital year blade virus verify win sell hope sauce effort acquire alien cradle area draw cube assault leg medal direct album light cargo income"
+const localUserMnemonic = "boy render dentist firm wisdom sphere raw relief key orbit urban collect quick cancel junk choose pause connect surround life squeeze aisle work price"
 const localUserAddr = "xar1mu4sgq98tx3mxweknzmqt95vp3zx07gmuqk6js"
 
 func TestTransactions(t *testing.T) {
@@ -32,6 +32,7 @@ func TestTransactions(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
+	br.From = c.GetKeyManager().GetAddr().String()
 
 	testPlaceBid(t, c)
 	testModifyCsdtTx(t, c)
@@ -56,11 +57,17 @@ var testingAccAddress = sdk.AccAddress([]byte(localUserAddr))
 var br = rest.BaseReq{ChainID: "testing"}
 
 func testPlaceBid(t *testing.T, c client.DexClient) {
-	auctionId := "auction_id"
+	auctionId := "0"
 	bidder := "bidder"
 	bid := "bid"
 	lot := "lot"
 	mpb := msg.NewPlaceBidReq(br, auctionId, bidder, bid, lot)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
 	tx, err := c.PlaceBidTx(mpb)
 	if err != nil {
 		t.Error(err.Error())
@@ -71,7 +78,7 @@ func testPlaceBid(t *testing.T, c client.DexClient) {
 		t.Error(err.Error())
 	}
 
-	log.Println("PlaceBid tx", j)
+	log.Println("PlaceBid tx", string(j))
 }
 
 func testModifyCsdtTx(t *testing.T, c client.DexClient) {
@@ -101,10 +108,16 @@ func testModifyCsdtTx(t *testing.T, c client.DexClient) {
 func testIssueTx(t *testing.T, c client.DexClient) {
 	name := "issueName"
 	symbol := "symbol"
-	description := "description"
-	totalSupply := sdk.Int{}
+	description := "{\"desc\":\"ription\"}"
+	totalSupply := sdk.NewInt(1)
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
 	r := msg.NewPostIssueReq(br, params)
 	tx, err := c.IssueTx(r)
 	if err != nil {
@@ -126,6 +139,11 @@ func testIssueApproveTx(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -152,6 +170,11 @@ func testIssueIncreaseApprovalTx(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -177,6 +200,11 @@ func testIssueDecreaseApprovalTx(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -202,6 +230,11 @@ func testIssueBurnTx(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -226,6 +259,11 @@ func testIssueBurnFromTx(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -251,6 +289,11 @@ func testIssueFreeze(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -276,6 +319,11 @@ func testIssueUnfreeze(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -301,6 +349,11 @@ func testIssueSendFrom(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -317,7 +370,7 @@ func testIssueSendFrom(t *testing.T, c client.DexClient) {
 		t.Error(err.Error())
 	}
 
-	log.Println("IssueSendFrom tx", string(j))
+	log.Println("MsgIssueSendFrom tx", string(j))
 }
 
 func testIssueMint(t *testing.T, c client.DexClient) {
@@ -327,6 +380,11 @@ func testIssueMint(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -342,7 +400,7 @@ func testIssueMint(t *testing.T, c client.DexClient) {
 		t.Error(err.Error())
 	}
 
-	log.Println("IssueMint tx", string(j))
+	log.Println("MsgIssueMint tx", string(j))
 }
 
 func testIssueTransfer(t *testing.T, c client.DexClient) {
@@ -352,6 +410,11 @@ func testIssueTransfer(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -376,6 +439,11 @@ func testIssueDisableFeature(t *testing.T, c client.DexClient) {
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewPostIssueReq(br, params)
 
 	issueId := "issueId"
@@ -396,6 +464,11 @@ func testIssueDisableFeature(t *testing.T, c client.DexClient) {
 func testLiquidatorSieze(t *testing.T, c client.DexClient) {
 	collateralDenom := "collateralDenom"
 	accAddr := types.AccAddress([]byte("xar1hcz69efwpsttfx0a3p8xxrkjrmgrm3rwsceut3"))
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	r := msg.NewSASCARequest(br, accAddr, accAddr, collateralDenom)
 	tx, err := c.LiquidatorSieze(r)
 	if err != nil {
@@ -410,13 +483,37 @@ func testLiquidatorSieze(t *testing.T, c client.DexClient) {
 	log.Println("LiquidatorSieze tx", string(j))
 }
 
+// temporary method. will be removed in a following commits
+func TestPostRequestsVer(t *testing.T) {
+	km, err := keys.NewMnemonicKeyManager(localUserMnemonic)
+	if err != nil {
+		panic(err)
+	}
+	log.Println(km.GetAddr().String())
+
+	c, err := client.NewCustomClient(baseUrl, types.TestNetwork, km)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	br.From = c.GetKeyManager().GetAddr().String()
+	//
+	//err = c.CollectAccountInfo()
+	//if err != nil {
+	//	t.Errorf(err.Error())
+	//}
+	testIssueTx(t, c)
+
+	//testDebtAuction(t, c)
+}
+
 func testDebtAuction(t *testing.T, c client.DexClient) {
-	accAddr := types.AccAddress([]byte("xar1hcz69efwpsttfx0a3p8xxrkjrmgrm3rwsceut3"))
-	issueId := "issueId"
-	accAddress := "accAddress"
-	amount := "amount"
-	r := msg.NewDebtAuctionRequest(br, accAddr)
-	tx, err := c.DebtAuction(r, issueId, accAddress, amount)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	r := msg.NewDebtAuctionRequest(br, c.GetKeyManager().GetAddr())
+	tx, err := c.DebtAuction(r)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -435,6 +532,11 @@ func testPriceRequest(t *testing.T, c client.DexClient) {
 	price := "price"
 	expiry := "expiry"
 	r := msg.NewPriceReq(br, assetCode, price, expiry)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	tx, err := c.PriceRequest(r, issueId)
 	if err != nil {
 		t.Error(err.Error())

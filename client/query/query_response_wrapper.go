@@ -1,15 +1,11 @@
 package query
 
 import (
-	"encoding/json"
-	"go-sdk/types/tx"
-	"strconv"
+	"github.com/valyala/fastjson"
 )
 
 type QueryResponse struct {
-	Height uint64              `json:"height"`
-	Result interface{}         `json:"result"`
-	Error  tx.QueryErrorResult `json:"error"`
+	json *fastjson.Value
 }
 
 type queryResponseSimplified struct {
@@ -18,35 +14,45 @@ type queryResponseSimplified struct {
 	Error  string      `json:"error"`
 }
 
-func WrapQueryResponse(resp interface{}) *QueryResponse {
-	return &QueryResponse{
-		Result: resp,
-	}
+func ResponseWithHeight() *QueryResponse {
+	return &QueryResponse{}
+}
+
+func (q *QueryResponse) Json() *fastjson.Value {
+	return q.json
 }
 
 func (q *QueryResponse) MustUnmarshal(j []byte) {
-	qs := new(queryResponseSimplified)
-	err := json.Unmarshal(j, qs)
+	var p fastjson.Parser
+	v, err := p.ParseBytes(j)
 	if err != nil {
-		if len(j) > 0 {
-			q.Error.Message = string(j)
-			return
-		}
 		panic(err)
 	}
 
-	if qs.Error != "" {
-		err = json.Unmarshal([]byte(qs.Error), &q.Error)
-		if err != nil {
-			q.Error.Message = qs.Error
-		}
-	}
-
-	if qs.Height != "" {
-		_, err = strconv.ParseInt(qs.Height, 10, 64)
-		if err != nil {
-			panic(err)
-		}
-	}
-	q.Result = qs.Result
+	q.json = v
+	//qs := new(queryResponseSimplified)
+	//err := json.Unmarshal(j, qs)
+	//if err != nil {
+	//	if len(j) > 0 {
+	//		q.Error.Message = string(j)
+	//		return
+	//	}
+	//	panic(err)
+	//}
+	//
+	//if qs.Error != "" {
+	//	err = json.Unmarshal([]byte(qs.Error), &q.Error)
+	//	if err != nil {
+	//		q.Error.Message = qs.Error
+	//	}
+	//}
+	//
+	//if qs.Height != "" {
+	//	h, err := strconv.ParseInt(qs.Height, 10, 64)
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	q.Height = uint64(h)
+	//}
+	//q.Result = qs.Result
 }

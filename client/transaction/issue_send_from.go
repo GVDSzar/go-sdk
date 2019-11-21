@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (c *client) IssueSendFrom(r *msg.PostIssueReq, issueId, from, to, amount string) (*tx.TxCommitResult, error) {
+func (c *client) IssueSendFrom(r *msg.PostIssueReq, issueId, from, to, amount string) (*tx.TxBroadcastResult, error) {
 
 	return c.RestTransaction(r, issueSendFrom(issueId, from, to, amount), http.MethodPost)
 }

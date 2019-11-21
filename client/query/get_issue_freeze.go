@@ -2,11 +2,10 @@ package query
 
 import (
 	"go-sdk/common"
-	"go-sdk/common/types"
 )
 
 func (c *client) GetIssueFreezes(issueId string) (*QueryResponse, error) {
-	var obj = WrapQueryResponse(types.IssueAddressFreezeListWithHeight{})
+	var obj = ResponseWithHeight()
 	resp, code, err := c.baseClient.Get(IssueFreezesEndpoint(issueId), emptyQP)
 	obj.MustUnmarshal(resp)
 

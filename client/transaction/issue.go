@@ -8,7 +8,6 @@ import (
 
 //NewPostIssueReq
 
-func (c *client) IssueTx(r *msg.PostIssueReq) (*tx.TxCommitResult, error) {
-
+func (c *client) IssueTx(r *msg.PostIssueReq) (*tx.TxBroadcastResult, error) {
 	return c.RestTransaction(r, postIssueEndpoint, http.MethodPost)
 }

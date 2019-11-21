@@ -2,7 +2,7 @@ package msg
 
 import "github.com/cosmos/cosmos-sdk/types"
 
-type IssueSendFrom struct {
+type MsgIssueSendFrom struct {
 	IssueId     string         `json:"issue_id" yaml:"issue_id"`
 	FromAddress types.AccAddress `json:"from_address" yaml:"from_address"`
 	From        types.AccAddress `json:"from" yaml:"from"`
@@ -11,13 +11,13 @@ type IssueSendFrom struct {
 }
 
 // Route Implements Msg.
-func (msg IssueSendFrom) Route() string { return "issue" }
+func (msg MsgIssueSendFrom) Route() string { return "issue" }
 
 // Type Implements Msg.
-func (msg IssueSendFrom) Type() string { return "issue_send_from" }
+func (msg MsgIssueSendFrom) Type() string { return "issue_send_from" }
 
 // Implements Msg. Ensures addresses are valid and Coin is positive
-func (msg IssueSendFrom) ValidateBasic() error {
+func (msg MsgIssueSendFrom) ValidateBasic() error {
 	if len(msg.IssueId) == 0 {
 		return types.ErrInvalidAddress("issueId cannot be empty")
 	}
@@ -32,11 +32,11 @@ func (msg IssueSendFrom) ValidateBasic() error {
 }
 
 // GetSignBytes Implements Msg.
-func (msg IssueSendFrom) GetSignBytes() []byte {
+func (msg MsgIssueSendFrom) GetSignBytes() []byte {
 	return Cdc.MustMarshalJSON(msg)
 }
 
 // GetSigners Implements Msg.
-func (msg IssueSendFrom) GetSigners() []types.AccAddress {
+func (msg MsgIssueSendFrom) GetSigners() []types.AccAddress {
 	return []types.AccAddress{msg.FromAddress}
 }

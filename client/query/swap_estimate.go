@@ -2,11 +2,10 @@ package query
 
 import (
 	"go-sdk/common"
-	"go-sdk/common/types"
 )
 
 func (c *client) SwapEstimate() (*QueryResponse, error) {
-	var obj = WrapQueryResponse(types.MsgSwap{})
+	var obj = ResponseWithHeight()
 	resp, code, err := c.baseClient.Get(InterestEndpoint, emptyQP)
 	obj.MustUnmarshal(resp)
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (c *client) IssueFreeze(r *msg.PostIssueReq, freezeType, issueId, accAddress string) (*tx.TxCommitResult, error) {
+func (c *client) IssueFreeze(r *msg.PostIssueReq, freezeType, issueId, accAddress string) (*tx.TxBroadcastResult, error) {
 
 	return c.RestTransaction(r, issueFreeze(freezeType, issueId, accAddress), http.MethodPost)
 }

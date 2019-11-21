@@ -2,11 +2,10 @@ package query
 
 import (
 	"go-sdk/common"
-	"go-sdk/common/types"
 )
 
 func (c *client) GetAuctions() (*QueryResponse, error) {
-	var aucts = WrapQueryResponse(types.Auctions{})
+	var aucts = ResponseWithHeight()
 	resp, code, err := c.baseClient.Get(AuctionEndpoint, emptyQP)
 	aucts.MustUnmarshal(resp)
 

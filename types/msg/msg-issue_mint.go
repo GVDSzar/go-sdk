@@ -7,7 +7,7 @@ import (
 
 var CoinMaxTotalSupply, _ = types.NewIntFromString("1000000000000000000000000000000000000")
 
-type IssueMint struct {
+type MsgIssueMint struct {
 	IssueId     string           `json:"issue_id" yaml:"issue_id"`
 	FromAddress types.AccAddress `json:"from_address" yaml:"from_address"`
 	ToAddress   types.AccAddress `json:"to_address" yaml:"to_address"`
@@ -15,13 +15,13 @@ type IssueMint struct {
 }
 
 // Route Implements Msg.
-func (msg IssueMint) Route() string { return "issue" }
+func (msg MsgIssueMint) Route() string { return "issue" }
 
 // Type Implements Msg.
-func (msg IssueMint) Type() string { return "issue_mint" }
+func (msg MsgIssueMint) Type() string { return "issue_mint" }
 
 // Implements Msg. Ensures addresses are valid and Coin is positive
-func (msg IssueMint) ValidateBasic() error {
+func (msg MsgIssueMint) ValidateBasic() error {
 	if len(msg.IssueId) == 0 {
 		return errors.New("issueId cannot be empty")
 	}
@@ -36,11 +36,11 @@ func (msg IssueMint) ValidateBasic() error {
 }
 
 // GetSignBytes Implements Msg.
-func (msg IssueMint) GetSignBytes() []byte {
+func (msg MsgIssueMint) GetSignBytes() []byte {
 	return Cdc.MustMarshalJSON(msg)
 }
 
 // GetSigners Implements Msg.
-func (msg IssueMint) GetSigners() []types.AccAddress {
+func (msg MsgIssueMint) GetSigners() []types.AccAddress {
 	return []types.AccAddress{msg.FromAddress}
 }

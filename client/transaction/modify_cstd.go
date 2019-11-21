@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (c *client) ModifyCsdtTx(r *msg.ModifyCsdtReq) (*tx.TxCommitResult, error) {
+func (c *client) ModifyCsdtTx(r *msg.ModifyCsdtReq) (*tx.TxBroadcastResult, error) {
 
 	return c.RestTransaction(r, csdtParamsEndpoint, http.MethodPut)
 }

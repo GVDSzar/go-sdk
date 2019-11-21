@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (c *client) IssueIncreaseApprovalTx(r *msg.PostIssueReq, issueId, accAddress, amount string) (*tx.TxCommitResult, error) {
+func (c *client) IssueIncreaseApprovalTx(r *msg.PostIssueReq, issueId, accAddress, amount string) (*tx.TxBroadcastResult, error) {
 
 	return c.RestTransaction(r, issueIncreaseApproval(issueId, accAddress, amount), http.MethodPost)
 }

@@ -7,19 +7,19 @@ import (
 
 const CoinDescriptionMaxLength = 1024
 
-type IssueDescription struct {
+type MsgIssueDescription struct {
 	IssueId     string           `json:"issue_id" yaml:"issue_id"`
 	FromAddress types.AccAddress `json:"from_address" yaml:"from_address"`
 	Description []byte           `json:"description" yaml:"description"`
 }
 
-func (msg IssueDescription) Route() string { return "issue" }
+func (msg MsgIssueDescription) Route() string { return "issue" }
 
 // Type Implements Msg.
-func (msg IssueDescription) Type() string { return "issue_description" }
+func (msg MsgIssueDescription) Type() string { return "issue_description" }
 
 // Implements Msg. Ensures addresses are valid and Coin is positive
-func (msg IssueDescription) ValidateBasic() error {
+func (msg MsgIssueDescription) ValidateBasic() error {
 	if len(msg.IssueId) == 0 {
 		return errors.New("issueId cannot be empty")
 	}
@@ -31,11 +31,11 @@ func (msg IssueDescription) ValidateBasic() error {
 }
 
 // GetSignBytes Implements Msg.
-func (msg IssueDescription) GetSignBytes() []byte {
+func (msg MsgIssueDescription) GetSignBytes() []byte {
 	return Cdc.MustMarshalJSON(msg)
 }
 
 // GetSigners Implements Msg.
-func (msg IssueDescription) GetSigners() []types.AccAddress {
+func (msg MsgIssueDescription) GetSigners() []types.AccAddress {
 	return []types.AccAddress{msg.FromAddress}
 }

@@ -61,7 +61,7 @@ func NewIssueParamsBm(name, symbol, description string, totalSupply types.Int, b
 }
 
 func NewIssueParams(name, symbol, description string, totalSupply types.Int, burnOwnerDisabled, burnHolderDisabled, burnFromDisabled, mintingFinished, freezeDisabled bool) *IssueParams {
-	return &IssueParams {
+	return &IssueParams{
 		Name: name,
 		Symbol: symbol,
 		Description: description,

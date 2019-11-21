@@ -1,32 +1,30 @@
 package msg
 
 import (
-	"github.com/cosmos/cosmos-sdk/types/rest"
 	"go-sdk/common/types"
 )
 
-type StartDebtAuctionRequest struct {
-	BaseReq rest.BaseReq     `json:"base_req"`
-	Sender  types.AccAddress `json:"sender"`
+type MsgStartDebtAuction struct {
+	Sender  string `json:"Sender"`
 }
 
-func NewDebtAuctionRequest(br rest.BaseReq, sender types.AccAddress) *StartDebtAuctionRequest {
-	return &StartDebtAuctionRequest {br, sender}
+func NewDebtAuction(sender types.AccAddress) *MsgStartDebtAuction {
+	return &MsgStartDebtAuction{sender.String()}
 }
 
 // Route should return the name of the module
-func (msg StartDebtAuctionRequest) Route() string { return "nameservice" }
+func (msg MsgStartDebtAuction) Route() string { return "nameservice" }
 
 // Type should return the action
-func (msg StartDebtAuctionRequest) Type() string { return "buy_name" }
+func (msg MsgStartDebtAuction) Type() string { return "buy_name" }
 
 // ValidateBasic runs stateless checks on the message
-func (msg StartDebtAuctionRequest) ValidateBasic() error {
+func (msg MsgStartDebtAuction) ValidateBasic() error {
 	return nil
 }
 
 // GetSignBytes encodes the message for signing
-func (msg StartDebtAuctionRequest) GetSignBytes() []byte {
+func (msg MsgStartDebtAuction) GetSignBytes() []byte {
 	b, err := Cdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -35,15 +33,10 @@ func (msg StartDebtAuctionRequest) GetSignBytes() []byte {
 }
 
 // GetSigners defines whose signature is required
-func (msg StartDebtAuctionRequest) GetSigners() []types.AccAddress {
+func (msg MsgStartDebtAuction) GetSigners() []types.AccAddress {
 	return nil
 }
 
-func (msg StartDebtAuctionRequest) GetInvolvedAddresses() []types.AccAddress {
+func (msg MsgStartDebtAuction) GetInvolvedAddresses() []types.AccAddress {
 	return msg.GetSigners()
-}
-
-func (m StartDebtAuctionRequest) ValidateMsg(res Msg) error {
-	// validate incoming msg
-	return nil
 }

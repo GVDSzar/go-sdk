@@ -28,3 +28,27 @@ type TxCommitResult struct {
 	Code   int32  `json:"code"`
 	Data   string `json:"data"`
 }
+
+type TxBroadcastResult struct {
+	Height string  `json:"height"`
+	TxHash string  `json:"txhash"`
+	RawLog string  `json:"raw_log"`
+	Logs   []TxLog `json:"logs"`
+}
+
+type TxLog struct {
+	MsgIndex uint64     `json:"msg_index"`
+	Success  bool       `json:"success"`
+	Log      string     `json:"log"`
+	Events   []TxEvents `json:"events"`
+}
+
+type TxEvents struct {
+	Type       string        `json:"type"`
+	Attributes []TxAttribute `json:"attributes"`
+}
+
+type TxAttribute struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}

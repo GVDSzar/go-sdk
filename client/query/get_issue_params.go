@@ -2,11 +2,10 @@ package query
 
 import (
 	"go-sdk/common"
-	"go-sdk/common/types"
 )
 
 func (c *client) GetIssueParams() (*QueryResponse, error) {
-	var obj = WrapQueryResponse(types.Params{})
+	var obj = ResponseWithHeight()
 	resp, code, err := c.baseClient.Get(IssueParamsEndpoint, emptyQP)
 	obj.MustUnmarshal(resp)
 

@@ -7,7 +7,7 @@ import (
 
 type PostIssueReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
-	IssueParams *IssueParams `json:"issue_params"`
+	IssueParams *IssueParams `json:"issue"`
 }
 
 func NewPostIssueReq(rest rest.BaseReq, issueParams *IssueParams) *PostIssueReq {

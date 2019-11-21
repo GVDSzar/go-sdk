@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func (c *client) BuyNameTx(br *rest.BaseReq, name, amount, buyer string) (*tx.TxCommitResult, error) {
+func (c *client) BuyNameTx(br *rest.BaseReq, name, amount, buyer string) (*tx.TxBroadcastResult, error) {
 	r, err := msg.NewBuyNameRequest(br, name, amount, buyer)
 	if err != nil {
 		return nil, err

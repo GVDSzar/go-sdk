@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"log"
@@ -52,27 +53,31 @@ type TransactionClient interface {
 	GetKeyManager() keys.KeyManager
 
 	// Wrapper for a post/put transactions. Allows to request an arbitrary path relative to baseURL
-	RestTransaction(txRequest msg.RestTransactionRequest, path, method string) (txRes *tx.TxCommitResult, err error)
+	RestTransaction(txRequest msg.RestTransactionRequest, path, method string) (txRes *tx.TxBroadcastResult, err error)
 
 	// Xar requests
-	BuyNameTx(br *rest.BaseReq, name, amount, buyer string) (*tx.TxCommitResult, error)
-	PlaceBidTx(r *msg.PlaceBidReq) (*tx.TxCommitResult, error)
-	ModifyCsdtTx(r *msg.ModifyCsdtReq) (*tx.TxCommitResult, error)
-	IssueTx(r *msg.PostIssueReq) (*tx.TxCommitResult, error)
-	IssueApproveTx(r *msg.PostIssueReq, issueId, accAddress, amount string) (*tx.TxCommitResult, error)
-	IssueIncreaseApprovalTx(r *msg.PostIssueReq, issueId, accAddress, amount string) (*tx.TxCommitResult, error)
-	IssueDecreaseApprovalTx(r *msg.PostIssueReq, issueId, accAddress, amount string) (*tx.TxCommitResult, error)
-	IssueBurnTx(r *msg.PostIssueReq, issueId, amount string) (*tx.TxCommitResult, error)
-	IssueBurnFromTx(r *msg.PostIssueReq, issueId, accAddress, amount string) (*tx.TxCommitResult, error)
-	IssueFreeze(r *msg.PostIssueReq, freezeType, issueId, accAddress string) (*tx.TxCommitResult, error)
-	IssueUnfreeze(r *msg.PostIssueReq, freezeType, issueId, accAddress string) (*tx.TxCommitResult, error)
-	IssueSendFrom(r *msg.PostIssueReq, issueId, from, to, amount string) (*tx.TxCommitResult, error)
-	IssueMint(r *msg.PostIssueReq, issueId, amount, to string) (*tx.TxCommitResult, error)
-	IssueTransfer(r *msg.PostIssueReq, issueId, to string) (*tx.TxCommitResult, error)
-	IssueDisableFeature(r *msg.PostIssueReq, issueId, feature string) (*tx.TxCommitResult, error)
-	LiquidatorSieze(r *msg.SeizeAndStartCollateralAuctionRequest) (*tx.TxCommitResult, error)
-	DebtAuction(r *msg.StartDebtAuctionRequest, issueId, accAddress, amount string) (*tx.TxCommitResult, error)
-	PriceRequest(r *msg.PriceReq, issueId string) (*tx.TxCommitResult, error)
+	BuyNameTx(br *rest.BaseReq, name, amount, buyer string) (*tx.TxBroadcastResult, error)
+	PlaceBidTx(r *msg.PlaceBidReq) (*tx.TxBroadcastResult, error)
+	ModifyCsdtTx(r *msg.ModifyCsdtReq) (*tx.TxBroadcastResult, error)
+	IssueTx(r *msg.PostIssueReq) (*tx.TxBroadcastResult, error)
+	IssueApproveTx(r *msg.PostIssueReq, issueId, accAddress, amount string) (*tx.TxBroadcastResult, error)
+	IssueIncreaseApprovalTx(r *msg.PostIssueReq, issueId, accAddress, amount string) (*tx.TxBroadcastResult, error)
+	IssueDecreaseApprovalTx(r *msg.PostIssueReq, issueId, accAddress, amount string) (*tx.TxBroadcastResult, error)
+	IssueBurnTx(r *msg.PostIssueReq, issueId, amount string) (*tx.TxBroadcastResult, error)
+	IssueBurnFromTx(r *msg.PostIssueReq, issueId, accAddress, amount string) (*tx.TxBroadcastResult, error)
+	IssueFreeze(r *msg.PostIssueReq, freezeType, issueId, accAddress string) (*tx.TxBroadcastResult, error)
+	IssueUnfreeze(r *msg.PostIssueReq, freezeType, issueId, accAddress string) (*tx.TxBroadcastResult, error)
+	IssueSendFrom(r *msg.PostIssueReq, issueId, from, to, amount string) (*tx.TxBroadcastResult, error)
+	IssueMint(r *msg.PostIssueReq, issueId, amount, to string) (*tx.TxBroadcastResult, error)
+	IssueTransfer(r *msg.PostIssueReq, issueId, to string) (*tx.TxBroadcastResult, error)
+	IssueDisableFeature(r *msg.PostIssueReq, issueId, feature string) (*tx.TxBroadcastResult, error)
+	LiquidatorSieze(r *msg.SeizeAndStartCollateralAuctionRequest) (*tx.TxBroadcastResult, error)
+	DebtAuction(r *msg.StartDebtAuctionRequest) (*tx.TxBroadcastResult, error)
+	PriceRequest(r *msg.PriceReq, issueId string) (*tx.TxBroadcastResult, error)
+	IssueDescription(r *msg.PostIssueReq, issueId string) (*tx.TxBroadcastResult, error)
+	GetAccountInfo() (*types.AccountInfo, error)
+	SetAccountInfo(*types.AccountInfo)
+	CollectAccountInfo() error
 }
 
 type client struct {
@@ -80,15 +85,30 @@ type client struct {
 	queryClient query.QueryClient
 	keyManager  keys.KeyManager
 	chainId     string
+
+	accountInfo *types.AccountInfo
+}
+
+func (c *client) SetAccountInfo(accountInfo *types.AccountInfo) {
+	c.accountInfo = accountInfo
+}
+
+func (c *client) CollectAccountInfo() error {
+	accInfo, err := c.GetAccountInfo()
+	if err != nil {
+		return err
+	}
+	c.SetAccountInfo(accInfo)
+	return nil
 }
 
 func NewClient(chainId string, keyManager keys.KeyManager, queryClient query.QueryClient, basicClient basic.BasicClient) TransactionClient {
-	return &client{basicClient, queryClient, keyManager, chainId}
+	return &client{basicClient, queryClient, keyManager, chainId, nil}
 }
 
 // a common function to perform arbitrary transactions.
 // requests an stdTx message, validates it, signs and broadcasts
-func (c *client) RestTransaction(txRequest msg.RestTransactionRequest, path, method string) (txRes *tx.TxCommitResult, err error) {
+func (c *client) RestTransaction(txRequest msg.RestTransactionRequest, path, method string) (txRes *tx.TxBroadcastResult, err error) {
 	stdTx, err := c.getValidStdTx(txRequest, path, method)
 	if err != nil {
 		return
@@ -109,6 +129,7 @@ func (c *client) getValidStdTx(txRequest msg.RestTransactionRequest, path, metho
 	t = new(tx.StdTxBasic)
 
 	reqBody := txRequest.GetSignBytes()
+	log.Println("reqBody", string(reqBody))
 	res, err := c.basicClient.FastHttpRequest(path, method, reqBody)
 	if err != nil {
 		return
@@ -133,7 +154,7 @@ func (c *client) getValidStdTx(txRequest msg.RestTransactionRequest, path, metho
 }
 
 func (c *client) getSignatures(stdTx *tx.StdTxBasic) (sigs []tx.StdSignatureBasic, err error) {
-	bytesToSign := tx.StdSignBytesWithFee(c.chainId, 0, 0, stdTx.GetMsgs(), stdTx.Memo, stdTx.Fee)
+	bytesToSign := tx.StdSignBytesWithFee(c.chainId, c.accountInfo.AccountNumber, c.accountInfo.Sequence, stdTx.GetMsgs(), stdTx.Memo, stdTx.Fee)
 	sig, err := c.keyManager.GetPrivKey().Sign(bytesToSign)
 	if err != nil {
 		return
@@ -156,14 +177,15 @@ func (c *client) signTransaction(stdTx *tx.StdTxBasic, transactionMode string) (
 	return tx.NewDefaultTransaction(stdTx.GetMsgs(), sigs, stdTx.Fee, stdTx.Memo, transactionMode), nil
 }
 
-func (c *client) getCommitResult(stdTx *tx.TxBasic) (txRes *tx.TxCommitResult, err error) {
+func (c *client) getCommitResult(stdTx *tx.TxBasic) (txRes *tx.TxBroadcastResult, err error) {
 	rawResult, err := c.broadcastRawMsg(stdTx)
 	if err != nil {
 		return nil, err
 	}
 
-	txRes = new(tx.TxCommitResult)
-	return txRes, tx.Cdc.UnmarshalJSON(rawResult, txRes)
+	txRes = new(tx.TxBroadcastResult)
+	err = json.Unmarshal(rawResult, txRes)
+	return txRes, err
 }
 
 func (c *client) broadcastRawMsg(stdTx *tx.TxBasic) ([]byte, error) {

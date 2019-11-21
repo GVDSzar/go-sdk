@@ -6,6 +6,6 @@ import (
 	"net/http"
 )
 
-func (c *client) DebtAuction(r *msg.StartDebtAuctionRequest, issueId, accAddress, amount string) (*tx.TxCommitResult, error) {
+func (c *client) DebtAuction(r *msg.StartDebtAuctionRequest) (*tx.TxBroadcastResult, error) {
 	return c.RestTransaction(r, liquidatorMintEndpoint, http.MethodPost)
 }

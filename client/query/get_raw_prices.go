@@ -3,11 +3,10 @@ package query
 import (
 	"encoding/json"
 	"go-sdk/common"
-	"go-sdk/common/types"
 )
 
 func (c *client) GetRawPrices(assetCode string) (*QueryResponse, error) {
-	var obj = WrapQueryResponse(types.RawPrices{})
+	var obj = ResponseWithHeight()
 	resp, code, err := c.baseClient.Get(RawPricesEndpoint(assetCode), emptyQP)
 	obj.MustUnmarshal(resp)
 
