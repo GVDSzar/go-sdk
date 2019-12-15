@@ -38,6 +38,8 @@ type QueryClient interface {
 	GetRawPrices(assetCode string) (*QueryResponse, error)
 	GetCurrentPrice(assetCode string) (*QueryResponse, error)
 	GetPricefeedAssets() (*QueryResponse, error)
+	GetDenominationsSymbols() (*QueryResponse, error)
+	GetDenominationsToken(token string) (*QueryResponse, error)
 	SwapEstimate() (*QueryResponse, error)
 }
 

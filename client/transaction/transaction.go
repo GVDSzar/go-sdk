@@ -75,6 +75,11 @@ type TransactionClient interface {
 	DebtAuction(r *msg.StartDebtAuctionRequest) (*tx.TxBroadcastResult, error)
 	PriceRequest(r *msg.PriceReq, issueId string) (*tx.TxBroadcastResult, error)
 	IssueDescription(r *msg.PostIssueReq, issueId string) (*tx.TxBroadcastResult, error)
+	DenominationsIssueToken(r *msg.DenominationsIssueTokenReq) (*tx.TxBroadcastResult, error)
+	DenominationsMint(r *msg.DenominationsMintReq) (*tx.TxBroadcastResult, error)
+	DenominationsBurn(r *msg.DenominationsBurnReq) (*tx.TxBroadcastResult, error)
+	DenominationsFreeze(r *msg.DenominationsFreezeReq) (*tx.TxBroadcastResult, error)
+	DenominationsUnfreeze(r *msg.DenominationsUnfreezeReq) (*tx.TxBroadcastResult, error)
 	GetAccountInfo() (*types.AccountInfo, error)
 	SetAccountInfo(*types.AccountInfo)
 	CollectAccountInfo() error

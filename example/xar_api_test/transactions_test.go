@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/stretchr/testify/require"
 	"go-sdk/client"
 	"go-sdk/common/types"
 	"go-sdk/keys"
@@ -20,8 +21,8 @@ import (
 
 // it is assumed that std local rest-daemon is up
 const baseUrl = "localhost:1317"
-const localUserMnemonic = "canal diesel swim expand key puppy agent airport ride shrug walnut erosion toss inside oblige square sort square inspire tackle achieve promote urge field"
-const localUserAddr = "xar14p760judpsaengg0zp8g04tgvw8x6dq9zjupse"
+const localUserMnemonic = "rate inquiry vital aspect cycle shoe wet awesome pet anger what wealth region laugh under snack inside item case smoke horse tent output very"
+const localUserAddr = "xar142zhsnrypqgjg3effcry4vrpkduwgsl8e8967t"
 
 func TestTransactions(t *testing.T) {
 	km, err := keys.NewMnemonicKeyManager(localUserMnemonic)
@@ -52,6 +53,11 @@ func TestTransactions(t *testing.T) {
 	testLiquidatorSieze(t, c)
 	testDebtAuction(t, c)
 	testPriceRequest(t, c)
+	testDenominationsIssueToken(t, c)
+	testDenominationsMint(t, c)
+	testDenominationsBurn(t, c)
+	testDenominationsFreeze(t, c)
+	testDenominationsUnfreeze(t, c)
 }
 
 var testingAccAddress = sdk.AccAddress([]byte(localUserAddr))
@@ -80,6 +86,131 @@ func testPlaceBid(t *testing.T, c client.DexClient) {
 	}
 
 	log.Println("PlaceBid tx", string(j))
+}
+
+func TestT(t *testing.T) {
+	km, err := keys.NewMnemonicKeyManager(localUserMnemonic)
+	require.Nil(t, err)
+
+	c, err := client.NewCustomClient(baseUrl, types.TestNetwork, km)
+	require.Nil(t, err)
+
+	br.From = c.GetKeyManager().GetAddr().String()
+
+	//testDenominationsIssueToken(t, c)
+	testDenominationsMint(t, c)
+}
+
+func testDenominationsIssueToken(t *testing.T, c client.DexClient) {
+	//sourceAddr := sdk.AccAddress([]byte{0x03, 0x05})
+	testDenomName := "testd"
+	symb := "t"
+	var maxSupp int64 = 1
+
+	mpb := msg.NewDenominationsIssueTokenReq(br, localUserAddr, localUserAddr, testDenomName, symb, maxSupp, false)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	tx, err := c.DenominationsIssueToken(mpb)
+	require.Nil(t, err)
+
+	j, err := json.Marshal(tx)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	log.Println("DenominationsIssueToken tx", string(j))
+}
+
+func testDenominationsMint(t *testing.T, c client.DexClient) {
+	symb := "t"
+	var amt int64 = 1
+
+	mpb := msg.NewDenominationsMintReq(br, amt, symb, localUserAddr)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	tx, err := c.DenominationsMint(mpb)
+	require.Nil(t, err)
+
+	j, err := json.Marshal(tx)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	log.Println("DenominationsMint tx", string(j))
+}
+
+func testDenominationsBurn(t *testing.T, c client.DexClient) {
+	symb := "t"
+	var amt int64 = 1
+
+	mpb := msg.NewDenominationsBurnReq(br, amt, symb, localUserAddr)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	tx, err := c.DenominationsBurn(mpb)
+	require.Nil(t, err)
+
+	j, err := json.Marshal(tx)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	log.Println("DenominationsBurn tx", string(j))
+}
+
+func testDenominationsFreeze(t *testing.T, c client.DexClient) {
+	symb := "t"
+	var amt int64 = 1
+
+	mpb := msg.NewDenominationsFreezeReq(br, amt, symb, localUserAddr, localUserAddr)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	tx, err := c.DenominationsFreeze(mpb)
+	require.Nil(t, err)
+
+	j, err := json.Marshal(tx)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	log.Println("DenominationsFreeze tx", string(j))
+}
+
+func testDenominationsUnfreeze(t *testing.T, c client.DexClient) {
+	symb := "t"
+	var amt int64 = 1
+
+	mpb := msg.NewDenominationsUnfreezeReq(br, amt, symb, localUserAddr, localUserAddr)
+	err := c.CollectAccountInfo()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	tx, err := c.DenominationsUnfreeze(mpb)
+	require.Nil(t, err)
+
+	j, err := json.Marshal(tx)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	log.Println("DenominationsUnfreeze tx", string(j))
 }
 
 func testModifyCsdtTx(t *testing.T, c client.DexClient) {
@@ -165,9 +296,9 @@ func testIssueApproveTx(t *testing.T, c client.DexClient) {
 }
 
 func testIssueIncreaseApprovalTx(t *testing.T, c client.DexClient) {
-	name := "issueName"
-	symbol := "symbol"
-	description := "description"
+	name := "testinggname"
+	symbol := "SYMBOLLL"
+	description := "{\"desc\":\"ription\"}"
 	totalSupply := sdk.Int{}
 
 	params := msg.NewIssueParamsBm(name, symbol, description, totalSupply, 0)

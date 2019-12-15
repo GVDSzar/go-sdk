@@ -108,6 +108,12 @@ func RegisterCodec(cdc *amino.Codec) {
 	cdc.RegisterConcrete(MsgSwapOrder{}, "uniswap/MsgSwapOrder", nil)
 	cdc.RegisterConcrete(MsgAddLiquidity{}, "uniswap/MsgAddLiquidity", nil)
 	cdc.RegisterConcrete(MsgRemoveLiquidity{}, "uniswap/MsgRemoveLiquidity", nil)
+
+	cdc.RegisterConcrete(MsgIssueToken{}, "denominations/MsgIssueToken", nil)
+	cdc.RegisterConcrete(MsgMintCoins{}, "denominations/MsgMintCoins", nil)
+	cdc.RegisterConcrete(MsgBurnCoins{}, "denominations/MsgBurnCoins", nil)
+	cdc.RegisterConcrete(MsgFreezeCoins{}, "denominations/MsgFreezeCoins", nil)
+	cdc.RegisterConcrete(MsgUnfreezeCoins{}, "denominations/MsgUnfreezeCoins", nil)
 }
 
 func init() {

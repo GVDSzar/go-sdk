@@ -13,8 +13,13 @@ const (
 	IssueListEndpoint       = "/issue/list"
 	OutstandingDebtEndpoint = "/liquidator/outstandingdebt"
 	PricefeedAssetsEndpoint = "/assets"
+	GetDenominationSymbols  = "/denominations/tokens"
 	//"/issue/query/" // + {issue id}
 )
+
+func GetDenominationsTokenEndpoint(token string) string {
+	return fmt.Sprintf("/denominations/tokens/%s", token)
+}
 
 func IssueIdEndpoint(issueId string) string {
 	return fmt.Sprintf("/issue/query/%s", issueId)
