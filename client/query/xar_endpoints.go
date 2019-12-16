@@ -14,8 +14,29 @@ const (
 	OutstandingDebtEndpoint = "/liquidator/outstandingdebt"
 	PricefeedAssetsEndpoint = "/assets"
 	GetDenominationSymbols  = "/denominations/tokens"
+	GetNftDenomsEndpoint    = "/nft/denoms"
 	//"/issue/query/" // + {issue id}
 )
+
+func GetNftSupplyEndpoint(denom string) string {
+	return fmt.Sprintf("/nft/supply/%s", denom)
+}
+
+func GetNftOwnerByDenomEndpoint(delegatorAddr, denom string) string {
+	return fmt.Sprintf("/nft/owner/%s/collection/%s", delegatorAddr, denom)
+}
+
+func GetNftsEndpoint(denom , id string) string {
+	return fmt.Sprintf("/nft/collection/%s/nft/%s", denom, id)
+}
+
+func GetNftCollectionEndpoint(denom string) string {
+	return fmt.Sprintf("/nft/collection/%s", denom)
+}
+
+func GetNftOwnerEndpoint(delegatorAddr string) string {
+	return fmt.Sprintf("/nft/owner/%s", delegatorAddr)
+}
 
 func GetDenominationsTokenEndpoint(token string) string {
 	return fmt.Sprintf("/denominations/tokens/%s", token)

@@ -40,6 +40,12 @@ type QueryClient interface {
 	GetPricefeedAssets() (*QueryResponse, error)
 	GetDenominationsSymbols() (*QueryResponse, error)
 	GetDenominationsToken(token string) (*QueryResponse, error)
+	GetNftSupply(token string) (*QueryResponse, error)
+	GetNftOwnerByDenom(delegatorAddr, denom string) (*QueryResponse, error)
+	GetNftOwner(denom string) (*QueryResponse, error)
+	GetNftCollection(denom string) (*QueryResponse, error)
+	GetNftDenoms(denom string) (*QueryResponse, error)
+	GetNfts(denom, id string) (*QueryResponse, error)
 	SwapEstimate() (*QueryResponse, error)
 }
 

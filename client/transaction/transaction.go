@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/pkg/errors"
 	"log"
 	"net/http"
 	"time"
@@ -80,6 +81,10 @@ type TransactionClient interface {
 	DenominationsBurn(r *msg.DenominationsBurnReq) (*tx.TxBroadcastResult, error)
 	DenominationsFreeze(r *msg.DenominationsFreezeReq) (*tx.TxBroadcastResult, error)
 	DenominationsUnfreeze(r *msg.DenominationsUnfreezeReq) (*tx.TxBroadcastResult, error)
+	NftsTransfer(r *msg.TransferNFTReq) (*tx.TxBroadcastResult, error)
+	NftsEditMetadata(r *msg.EditNFTMetadataReq, denom, id string) (*tx.TxBroadcastResult, error)
+	NftsMint(r *msg.MintNFTReq) (*tx.TxBroadcastResult, error)
+	NftsBurn(r *msg.BurnNFTReq, denom, id string) (*tx.TxBroadcastResult, error)
 	GetAccountInfo() (*types.AccountInfo, error)
 	SetAccountInfo(*types.AccountInfo)
 	CollectAccountInfo() error
@@ -160,6 +165,9 @@ func (c *client) getValidStdTx(txRequest msg.RestTransactionRequest, path, metho
 }
 
 func (c *client) getSignatures(stdTx *tx.StdTxBasic) (sigs []tx.StdSignatureBasic, err error) {
+	if stdTx == nil {
+		return nil, errors.New("std tx cannot be null")
+	}
 	bytesToSign := tx.StdSignBytesWithFee(c.chainId, c.accountInfo.AccountNumber, c.accountInfo.Sequence, stdTx.GetMsgs(), stdTx.Memo, stdTx.Fee)
 	sig, err := c.keyManager.GetPrivKey().Sign(bytesToSign)
 	if err != nil {

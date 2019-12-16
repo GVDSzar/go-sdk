@@ -58,6 +58,7 @@ func TestTransactions(t *testing.T) {
 	testDenominationsBurn(t, c)
 	testDenominationsFreeze(t, c)
 	testDenominationsUnfreeze(t, c)
+	testNftsMint(t, c)
 }
 
 var testingAccAddress = sdk.AccAddress([]byte(localUserAddr))
@@ -96,9 +97,27 @@ func TestT(t *testing.T) {
 	require.Nil(t, err)
 
 	br.From = c.GetKeyManager().GetAddr().String()
+	err = c.CollectAccountInfo()
+	require.Nil(t, err)
 
 	//testDenominationsIssueToken(t, c)
-	testDenominationsMint(t, c)
+	testNftsMint(t, c)
+}
+
+func testNftsMint(t *testing.T, c client.DexClient) {
+	//accAddr := sdk.AccAddress([]byte(localUserAddr))
+	log.Println(string(c.GetKeyManager().GetAddr().Bytes()))
+	log.Println(c.GetKeyManager().GetAddr().String())
+	log.Println(c.GetKeyManager().GetAddr())
+	log.Println(sdk.AccAddress(c.GetKeyManager().GetAddr()))
+	mr := msg.NewMintNFTReq(br, c.GetKeyManager().GetAddr().Bytes(), "", "", "")
+	tx, err := c.NftsMint(mr)
+	require.Nil(t, err)
+
+	j, err := json.Marshal(tx)
+	require.Nil(t, err)
+
+	log.Println("testNftsMint tx", string(j))
 }
 
 func testDenominationsIssueToken(t *testing.T, c client.DexClient) {
