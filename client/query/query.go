@@ -46,6 +46,10 @@ type QueryClient interface {
 	GetNftCollection(denom string) (*QueryResponse, error)
 	GetNftDenoms(denom string) (*QueryResponse, error)
 	GetNfts(denom, id string) (*QueryResponse, error)
+	GetOracleRawPrices(assetCode string) (*QueryResponse, error)
+	GetOracleCurrentPrices(assetCode string) (*QueryResponse, error)
+	GetOracleAssets(assetCode string) (*QueryResponse, error)
+	GetSwapEstimate(sender, asset, targetDenom string) (*QueryResponse, error)
 	SwapEstimate() (*QueryResponse, error)
 }
 

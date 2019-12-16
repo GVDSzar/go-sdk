@@ -114,6 +114,12 @@ func RegisterCodec(cdc *amino.Codec) {
 	cdc.RegisterConcrete(MsgBurnCoins{}, "denominations/MsgBurnCoins", nil)
 	cdc.RegisterConcrete(MsgFreezeCoins{}, "denominations/MsgFreezeCoins", nil)
 	cdc.RegisterConcrete(MsgUnfreezeCoins{}, "denominations/MsgUnfreezeCoins", nil)
+
+	cdc.RegisterConcrete(MsgPostPrice{}, "oracle/MsgPostPrice", nil)
+	cdc.RegisterConcrete(MsgAddOracle{}, "oracle/MsgAddOracle", nil)
+	cdc.RegisterConcrete(MsgSetOracles{}, "oracle/MsgSetOracles", nil)
+	cdc.RegisterConcrete(MsgAddAsset{}, "oracle/MsgAddAsset", nil)
+	cdc.RegisterConcrete(MsgSetAsset{}, "oracle/MsgSetAsset", nil)
 }
 
 func init() {

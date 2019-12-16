@@ -70,6 +70,18 @@ func CurrentPricesEndpoint(assetCode string) string {
 	return fmt.Sprintf("/pricefeed/currentprice/%s", assetCode)
 }
 
+func GetOracleRawPricesEndpoint(restName string) string {
+	return fmt.Sprintf("/oracle/rawprices/%s", restName)
+}
+
+func GetOracleCurrentPricesEndpoint(restName string) string {
+	return fmt.Sprintf("/oracle/currentprice/%s", restName)
+}
+
+func GetAssets() string {
+	return fmt.Sprintf("/oracle/assets",)
+}
+
 func SwapEstimateEndpoint(sender, asset, targetDenom string) string {
 	return fmt.Sprintf("/swap/estimate/%s/%s/%s", sender, asset, targetDenom)
 }
