@@ -1,3 +1,14 @@
+This project extends the original binance-chain go-sdk with methods and structures suitable for interactions with XAR. For now, it extends the original DEX client with logic for rest-api interactions with a node of XAR api.
+
+**How to use it?**   
+If your project already includes the original go-sdk, you just need to replace it with this project. You'll become able to use new client features, and your previous interactions with go-sdk wont be affected. Alternatively, nothing but import requered.
+
+**How to test special xar logic?**   
+All the logic for a special interactions is added to `TransactionClient` and `QueryClient` interfaces below the original go-sdk methods. You can see the examples of usage inside the following folder: `example/xar_api_test`.   
+Basically you just need to create a new Dex client with `NewCustomClient()` method, and call the method you need.  
+
+
+
 # BNC Chain Go SDK
 
 
@@ -6,7 +17,7 @@ It includes the following core components:
 
 * **client** - implementations of Binance Chain transaction types and query, such as for transfers and trading.
 * **common** - core cryptographic functions, uuid functions and other useful functions.
-* **e2e** - end-to-end test package for go-sdk developer. For common users, it is also a good reference to use go-sdk. 
+* **e2e** - end-to-end test package for go-sdk developer. For common users, it is also a good reference to use go-sdk.
 * **keys** - implement `KeyManage` to manage private key and accounts.
 * **types** - core type of Binance Chain, such as `coin`, `account`, `tx` and `msg`.
 
@@ -28,7 +39,7 @@ replace github.com/tendermint/go-amino => github.com/binance-chain/bnc-go-amino 
 
 **NOTE**: Please make sure you use binance-chain amino repo instead of tendermint amino.
 
-## Usage 
+## Usage
 
 ### Key Manager
 
@@ -40,7 +51,7 @@ type KeyManager interface {
 	Sign(tx.StdSignMsg) ([]byte, error)
 	GetPrivKey() crypto.PrivKey
 	GetAddr() txmsg.AccAddress
-	
+
 	ExportAsMnemonic() (string, error)
 	ExportAsPrivateKey() (string, error)
 	ExportAsKeyStore(password string) (*EncryptedKeyJSON, error)
@@ -53,18 +64,18 @@ NewKeyManager() (KeyManager, error)
 
 NewMnemonicKeyManager(mnemonic string) (KeyManager, error)
 
-NewMnemonicPathKeyManager(mnemonic, keyPath string) (KeyManager, error) 
+NewMnemonicPathKeyManager(mnemonic, keyPath string) (KeyManager, error)
 
 NewKeyStoreKeyManager(file string, auth string) (KeyManager, error)
 
-NewPrivateKeyManager(priKey string) (KeyManager, error) 
+NewPrivateKeyManager(priKey string) (KeyManager, error)
 
 NewLedgerKeyManager(path ledger.DerivationPath) (KeyManager, error)
 
 ```
 - NewKeyManager. You will get a new private key without provide anything, you can export and save this `KeyManager`.
 - NewMnemonicKeyManager. You should provide your mnemonic, usually is a string of 24 words.
-- NewMnemonicPathKeyManager. The difference between `NewMnemonicKeyManager` is that you can use custom keypath to generate different `keyManager` while using the same mnemonic. 5 levels in BIP44 path: "purpose' / coin_type' / account' / change / address_index", "purpose' / coin_type'" is fixed as "44'/714'/", you can customize the rest part. 
+- NewMnemonicPathKeyManager. The difference between `NewMnemonicKeyManager` is that you can use custom keypath to generate different `keyManager` while using the same mnemonic. 5 levels in BIP44 path: "purpose' / coin_type' / account' / change / address_index", "purpose' / coin_type'" is fixed as "44'/714'/", you can customize the rest part.
 - NewKeyStoreKeyManager. You should provide a keybase json file and you password, you can download the key base json file when your create a wallet account.
 - NewPrivateKeyManager. You should provide a Hex encoded string of your private key.
 - NewLedgerKeyManager. You must have a ledger device with binance ledger app and connect it to your machine.
@@ -104,7 +115,7 @@ ExportAsMnemonic() (string, error)
 ExportAsPrivateKey() (string, error)
 
 ExportAsKeyStore(password string) (*EncryptedKeyJSON, error)
-``` 
+```
 
 Examples:
 ```go
@@ -117,7 +128,7 @@ newkm, _ := NewKeyStoreKeyManager("TestGenerateKeyStoreNoError.json", "testpassw
 encryPlain2, _ := newkm.GetPrivKey().Sign([]byte("test plain"))
 assert.True(t, bytes.Equal(encryPlain1, encryPlain2))
 ```
-**As for ledger key, it can't be exported. Because its private key is saved on ledger device and no one can directly access it outside.** 
+**As for ledger key, it can't be exported. Because its private key is saved on ledger device and no one can directly access it outside.**
 
 ### Init Client
 
@@ -132,10 +143,10 @@ keyManager, _ := keys.NewMnemonicKeyManager(mnemonic)
 client, err := sdk.NewDexClient("testnet-dex.binance.org", types.TestNetwork, keyManager)
 
 ```
-For sdk init, you should know the famous api address. Besides, you should know what kind of network the api gateway is in, since we have different configurations for 
+For sdk init, you should know the famous api address. Besides, you should know what kind of network the api gateway is in, since we have different configurations for
 test network and production network.
 
-|  ChainNetwork |  ApiAddr | 
+|  ChainNetwork |  ApiAddr |
 |-------------- |----------------------------------|
 |   TestNetwork | testnet-dex.binance.org  |  
 |   ProdNetwork | dex.binance.org          |                                |
@@ -145,7 +156,7 @@ If you want broadcast some transactions, like send coins, create orders or cance
 
 ### Example
 
-Create a `buy` order: 
+Create a `buy` order:
 ```go
 createOrderResult, err := client.CreateOrder(tradeSymbol, nativeSymbol, txmsg.OrderSide.BUY, 100000000, 100000000, true)
 ```
@@ -166,7 +177,7 @@ _, err = client.CreateOrder(tradeSymbol, nativeSymbol, msg.OrderSide.BUY, 100000
 For more API usage documentation, please check the [wiki](https://github.com/binance-chain/go-sdk/wiki)..
 
 ## RPC Client(Beta)
-RPC endpoints may be used to interact with a node directly over HTTP or websockets. Using RPC, you may perform low-level 
+RPC endpoints may be used to interact with a node directly over HTTP or websockets. Using RPC, you may perform low-level
 operations like executing ABCI queries, viewing network/consensus state or broadcasting a transaction against full node or
 light client.
 
